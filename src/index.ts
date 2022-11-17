@@ -1,8 +1,13 @@
 import express from "express";
-import { handleWebHook } from './github-action-receiver'
-require('dotenv').config()
+import bodyParser from 'body-parser'
 
+import { handleWebHook } from './github-action-receiver'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 const app = express();
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
     res.send('Hello from express and typescript');

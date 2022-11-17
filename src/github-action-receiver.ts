@@ -8,7 +8,7 @@ export interface WebHookResponse {
 export function handleWebHook(body: any, signatureHeader: string): WebHookResponse {
 
     const hmac = crypto.createHmac("sha1", process.env["GITHUB_WEBHOOK_SECRET"] as string);
-    const signature = hmac.update(JSON.stringify(body)).digest('hex');
+    const signature = hmac.update(JSON.stringify(body ?? {})).digest('hex');
     const shaSignature = `sha1=${signature}`;
 
     const gitHubSignature = signatureHeader;
