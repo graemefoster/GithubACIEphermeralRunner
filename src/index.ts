@@ -1,13 +1,17 @@
 import express from "express";
-const app = express();
+import { handleWebHook } from './github-action-receiver'
+require('dotenv').config()
 
+const app = express();
 
 app.get('/', (req, res) => {
     res.send('Hello from express and typescript');
 });
 
-app.get('/boo', (req, res) => {
-    res.send('YO BOOYAKKAAAA!');
+app.post('/webhook', (req, res) => {
+    const webHookResponse = handleWebHook(req.body, req.headers['x-hub-signature'] as string)
+    res.status(webHookResponse.status)
+    res.send(webHookResponse.body)
 });
 
 
