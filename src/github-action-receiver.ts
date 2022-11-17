@@ -1,5 +1,4 @@
-import crypto from 'crypto'
-import { Request, Response } from 'express'
+import { validateGithubSignature } from './github-signature-validation'
 
 export interface WebHookResponse {
     status: number,
@@ -7,17 +6,11 @@ export interface WebHookResponse {
 }
 export function handleWebHook(body: any, signatureHeader: string): WebHookResponse {
 
-    const hmac = crypto.createHmac("sha1", process.env["GITHUB_WEBHOOK_SECRET"] as string);
-    const signature = hmac.update(JSON.stringify(body ?? {})).digest('hex');
-    const shaSignature = `sha1=${signature}`;
-
-    const gitHubSignature = signatureHeader;
-
-    if (shaSignature.localeCompare(gitHubSignature)) {
+    if (!validateGithubSignature(body, signatureHeader)) {
         return {
             status: 401,
             body: "Signatures don't match"
-        };
+        }
     } else {
         const action = body?.action;
 
@@ -42,9 +35,9 @@ export function handleWebHook(body: any, signatureHeader: string): WebHookRespon
         }
 
         // extract required metadata
-        const org = body?.organization?.login;
-        const repo = body?.repository?.name;
-        const actor = body?.sender?.login;
+        const org = body?.organization?.login
+        const repo = body?.repository?.name
+        const actor = body?.sender?.login
         const labels = body?.workflow_job?.labels as string[]
 
         // log info

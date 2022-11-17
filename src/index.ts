@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
     res.send('Hello from express and typescript');
 });
 
