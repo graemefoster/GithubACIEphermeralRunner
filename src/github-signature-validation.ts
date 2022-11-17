@@ -6,7 +6,7 @@ export function validateGithubSignature(body: any, signatureHeader: string): boo
     const signature = hmac.update(JSON.stringify(body ?? {})).digest('hex');
     const shaSignature = `sha1=${signature}`;
 
-    const gitHubSignature = signatureHeader;
+    const gitHubSignature = signatureHeader
 
     return shaSignature.localeCompare(gitHubSignature) == 0
 }

@@ -29,7 +29,7 @@ export function handleWebHook(body: any, signatureHeader: string): WebHookRespon
             const msg = "Nothing to do for 'in_progress' event";
             console.log(msg);
             return {
-                status: 200,
+                status: 200, 
                 body: msg
             }
         }
@@ -45,6 +45,15 @@ export function handleWebHook(body: any, signatureHeader: string): WebHookRespon
 
         if (labels.length === 0) {
             const msg = `No labels supplied, so ignoring this event`;
+            console.log(msg);
+            return {
+                status: 200,
+                body: msg
+            }
+        }
+
+        if (labels[0] !== process.env['GITHUB_RUNS_ON']) {
+            const msg = `First label does not match GITHUB_RUNS_ON. Ignoring webjob.`;
             console.log(msg);
             return {
                 status: 200,
