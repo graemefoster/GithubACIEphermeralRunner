@@ -6,7 +6,9 @@ export interface WebHookResponse {
     body: string
 }
 
-export async function handleWebHook(body: any, signatureHeader: string): Promise<WebHookResponse> {
+export type SendQueueMessage = (s: string) => void
+
+export async function handleWebHook(body: any, signatureHeader: string, sendQueueMessage: SendQueueMessage): Promise<WebHookResponse> {
 
     if (!validateGithubSignature(body, signatureHeader)) {
         return {
@@ -55,7 +57,8 @@ export async function handleWebHook(body: any, signatureHeader: string): Promise
 
         // invoke the workflow to handle the scale up/scale down action
         console.log(`Handling action ${action}`);
-        await addJob(`${body.workflow_job.id}`, body.action)
+        const task = await addJob(`${body.workflow_job.id}`, body.action)
+        sendQueueMessage(task.rowKey)
         return {
             status: 200,
             body: `Interesting`

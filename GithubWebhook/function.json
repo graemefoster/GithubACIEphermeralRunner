@@ -14,6 +14,13 @@
       "type": "http",
       "direction": "out",
       "name": "res"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "msg",
+      "queueName": "githubmessagequeue",
+      "connection": "AzureWebJobsStorage"
     }
   ],
   "scriptFile": "../dist/GithubWebhook/index.js"

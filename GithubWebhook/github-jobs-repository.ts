@@ -6,7 +6,7 @@ enum JobStatus {
     Completed
 }
 
-type Task = {
+export type Task = {
     partitionKey: string
     rowKey: string
     description: string
@@ -15,7 +15,7 @@ type Task = {
     updatedAt: Date
 }
 
-export async function addJob(jobId: string, githubStatus: string): Promise<void> {
+export async function addJob(jobId: string, githubStatus: string): Promise<Task> {
 
     const tableUrl = process.env['AZURE_STORAGE_CONNECTION_STRING'] ?? ''
     const tableClient = TableClient.fromConnectionString(tableUrl, 'githubJobs')
@@ -29,6 +29,8 @@ export async function addJob(jobId: string, githubStatus: string): Promise<void>
         existingJob.status = status
         
         await tableClient.updateEntity(existingJob, 'Replace')
+        return existingJob
+
     } catch (e) {
         if (e instanceof RestError) {
             if (e.statusCode === 404) {
@@ -44,6 +46,7 @@ export async function addJob(jobId: string, githubStatus: string): Promise<void>
                 }
 
                 await tableClient.createEntity<Task>(task) 
+                return task
             }
         }
     }

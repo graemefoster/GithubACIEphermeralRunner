@@ -2,3 +2,5 @@ node_modules/
 dist/
 __azurite*
 local.settings.json
+__blobstorage__/
+__queuestorage__/
