@@ -1,10 +1,12 @@
 import { validateGithubSignature } from './github-signature-validation'
+import { addJob } from './github-jobs-repository'
 
 export interface WebHookResponse {
     status: number,
     body: string
 }
-export function handleWebHook(body: any, signatureHeader: string): WebHookResponse {
+
+export async function handleWebHook(body: any, signatureHeader: string): Promise<WebHookResponse> {
 
     if (!validateGithubSignature(body, signatureHeader)) {
         return {
@@ -21,16 +23,6 @@ export function handleWebHook(body: any, signatureHeader: string): WebHookRespon
             return {
                 status: 400,
                 body: "Expected 'workflow_job' payload"
-            }
-        }
-
-        // ignore 'in_progress' action
-        if (action === "in_progress") {
-            const msg = "Nothing to do for 'in_progress' event";
-            console.log(msg);
-            return {
-                status: 200, 
-                body: msg
             }
         }
 
@@ -62,7 +54,8 @@ export function handleWebHook(body: any, signatureHeader: string): WebHookRespon
         }
 
         // invoke the workflow to handle the scale up/scale down action
-        console.log(`Executing action ${action}`);
+        console.log(`Handling action ${action}`);
+        await addJob(`${body.workflow_job.id}`, body.action)
         return {
             status: 200,
             body: `Interesting`
