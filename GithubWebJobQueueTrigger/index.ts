@@ -6,8 +6,9 @@ import { Task, JobStatus } from '../GithubWebhook/github-jobs-repository'
 const subscriptionId = process.env['AZURE_SUBSCRIPTION_ID']
 const client = new ContainerInstanceManagementClient(new DefaultAzureCredential(), subscriptionId);
 
-const queueTrigger: AzureFunction = async function (context: Context, jobId: string, jobDetails: Task): Promise<void> {
+const queueTrigger: AzureFunction = async function (context: Context, jobId: string): Promise<void> {
 
+    const jobDetails = context.bindings.jobDetails as Task
     switch (jobDetails.status) {
         case JobStatus.Pending:
             await client.containerGroups.beginCreateOrUpdateAndWait(
