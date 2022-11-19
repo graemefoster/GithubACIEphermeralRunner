@@ -1,12 +1,22 @@
 {
   "bindings": [
     {
-      "name": "myQueueItem",
+      "name": "jobId",
       "type": "queueTrigger",
       "direction": "in",
       "queueName": "githubmessagequeue",
       "connection": "AzureWebJobsStorage"
+    },
+    {
+      "name": "jobDetails",
+      "type": "table",
+      "tableName": "githubJobs",
+      "partitionKey": "job",
+      "rowKey": "{queueTrigger}",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
     }
+
   ],
   "scriptFile": "../dist/GithubWebJobQueueTrigger/index.js"
 }

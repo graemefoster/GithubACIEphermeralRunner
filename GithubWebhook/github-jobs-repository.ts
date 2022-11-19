@@ -1,6 +1,6 @@
 import { TableClient, RestError } from '@azure/data-tables'
 
-enum JobStatus {
+export enum JobStatus {
     Pending,
     InProgress,
     Completed

@@ -10,7 +10,9 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "@azure/data-tables": "^13.2.0"
+    "@azure/arm-containerinstance": "^9.0.0",
+    "@azure/data-tables": "^13.2.0",
+    "@azure/identity": "^3.1.1"
   },
   "devDependencies": {
     "@azure/functions": "^3.0.0",
