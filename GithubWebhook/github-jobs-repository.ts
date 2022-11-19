@@ -15,15 +15,23 @@ export type Task = {
     updatedAt: Date
 }
 
+const tableUrl = process.env['AZURE_STORAGE_CONNECTION_STRING'] ?? ''
+const tableClient = TableClient.fromConnectionString(tableUrl, 'githubJobs')
+
+export async function getJob(jobId: string): Promise<Task> {
+
+    await tableClient.createTable()
+    return await tableClient.getEntity<Task>('job', `${jobId}`)
+}
+
+
 export async function addJob(jobId: string, githubStatus: string): Promise<Task> {
 
-    const tableUrl = process.env['AZURE_STORAGE_CONNECTION_STRING'] ?? ''
-    const tableClient = TableClient.fromConnectionString(tableUrl, 'githubJobs')
     await tableClient.createTable()
     const status = githubStatus === 'queued' ? JobStatus.Pending : githubStatus == 'in_progress' ? JobStatus.InProgress : JobStatus.Completed
 
     try {
-        const existingJob = await tableClient.getEntity<Task>('job', jobId)
+        let existingJob = await getJob(jobId)
         console.log(`Found existing job representing ${jobId} at status ${githubStatus})`)
         existingJob.updatedAt = new Date()
         existingJob.status = status
