@@ -27,4 +27,4 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - run: |
-          az resourcegroup list"
+          az container list --resource-group GithubRunnerTest
