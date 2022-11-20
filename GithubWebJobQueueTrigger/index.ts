@@ -80,4 +80,3 @@ const queueTrigger: AzureFunction = async function (context: Context, jobId: str
 };
 
 export default queueTrigger;
-\
