@@ -23,3 +23,8 @@ jobs:
     runs-on: ephemeral-aci
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - run: |
+          az resourcegroup list"
