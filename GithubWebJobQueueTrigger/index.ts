@@ -19,7 +19,7 @@ const queueTrigger: AzureFunction = async function (context: Context, jobId: str
                     osType: 'Linux',
                     containers: [
                         {
-                            image: 'myoung34/github-runner',
+                            image: 'graemefoster/graemesgithubactionrunner:0.1.0',
                             name: 'runner',
                             resources: {
                                 requests: {
