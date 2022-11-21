@@ -1,7 +1,7 @@
 import { AzureFunction, Context } from "@azure/functions"
 import { ContainerInstanceManagementClient } from '@azure/arm-containerinstance'
 import { DefaultAzureCredential } from '@azure/identity'
-import { Task, JobStatus, getJob } from '../GithubWebhook/github-jobs-repository'
+import { JobStatus, getJob } from '../Shared/github-jobs-repository'
 
 const subscriptionId = process.env['AZURE_SUBSCRIPTION_ID']
 const client = new ContainerInstanceManagementClient(new DefaultAzureCredential(), subscriptionId);
