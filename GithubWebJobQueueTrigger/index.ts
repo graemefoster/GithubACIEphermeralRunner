@@ -1,7 +1,7 @@
 import { AzureFunction, Context } from "@azure/functions"
 import { ContainerInstanceManagementClient } from '@azure/arm-containerinstance'
 import { DefaultAzureCredential } from '@azure/identity'
-import { JobStatus, getJob } from '../Shared/github-jobs-repository'
+import { JobStatus, getJob, updateJob } from '../Shared/github-jobs-repository'
 
 const subscriptionId = process.env['AZURE_SUBSCRIPTION_ID']
 const client = new ContainerInstanceManagementClient(new DefaultAzureCredential(), subscriptionId);
@@ -11,7 +11,8 @@ const queueTrigger: AzureFunction = async function (context: Context, jobId: str
     const jobDetails = await getJob(jobId)
     switch (jobDetails.status) {
         case JobStatus.Pending:
-            await client.containerGroups.beginCreateOrUpdateAndWait(
+            context.log('Creating container to run Pending job {jobId}', jobId)
+            const createOperation = await client.containerGroups.beginCreateOrUpdate(
                 process.env['AZURE_RESOURCE_GROUP'] as string,
                 `gh-${jobDetails.rowKey}`,
                 {
@@ -66,13 +67,22 @@ const queueTrigger: AzureFunction = async function (context: Context, jobId: str
                     ]
                 }
             )
+
+            jobDetails.status = JobStatus.BuildingContainer
+            await updateJob(jobDetails, context.log)
+
+            //could wait here but we just chew up function time. Optimisation could be a durable function to handle a serveless wait.
+            //await createOperation.pollUntilDone()
+
             break;
         case JobStatus.Completed:
             context.log('Detected job completion. Deleting container for job-id: {id}', jobDetails.rowKey)
-            await client.containerGroups.beginDeleteAndWait(
+            const deleteOperation = await client.containerGroups.beginDelete(
                 process.env['AZURE_RESOURCE_GROUP'] as string,
                 `gh-${jobDetails.rowKey}`,
             )
+            //could wait here but we just chew up function time. Optimisation could be a durable function to handle a serveless wait.
+            //await deleteOperation.pollUntilDone()
             break;
     }
 

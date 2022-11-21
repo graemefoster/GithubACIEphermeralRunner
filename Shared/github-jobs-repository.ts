@@ -5,6 +5,7 @@ export type Logger = (s: string, ...args: any[]) => void
 //Enum to represent 3 possible states of a Github Action job
 export enum JobStatus {
     Pending,
+    BuildingContainer,
     InProgress,
     Completed
 }
@@ -38,6 +39,12 @@ export async function getJob(jobId: string): Promise<ActionsJob | undefined> {
     }
 }
 
+export async function updateJob(job: ActionsJob, logger: Logger): Promise<ActionsJob> {
+    logger('Updating job {jobId}, status {githubStatus}', job.rowKey, job.status)
+    job.updatedAt = new Date()
+    await tableClient.updateEntity(job, 'Replace')
+    return job
+}
 
 export async function addOrUpdateJob(jobId: string, githubStatus: string, logger: Logger): Promise<ActionsJob> {
 
@@ -46,12 +53,8 @@ export async function addOrUpdateJob(jobId: string, githubStatus: string, logger
 
     let existingJob = await getJob(jobId)
     if (existingJob !== undefined) {
-        logger('Found existing job representing {jobId} at status {githubStatus}', jobId, githubStatus)
-        existingJob.updatedAt = new Date()
         existingJob.status = status
-
-        await tableClient.updateEntity(existingJob, 'Replace')
-        return existingJob
+        return await updateJob(existingJob, logger)
     }
     else {
         logger('Creating new job representing {jobId} at status {githubStatus}', jobId, githubStatus)
